@@ -1,0 +1,82 @@
+{
+  "name": "software-dev-ai-claude-toolkit",
+  "version": "1.0.0",
+  "license": "MIT",
+  "homepage": "https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit",
+  "description": "Production-ready Claude Code configuration for backend-heavy full-stack developers.",
+  "stacks": [
+    "java-springboot",
+    "python-fastapi",
+    "javascript-express-react",
+    "postgresql",
+    "mongodb",
+    "redis",
+    "kafka",
+    "flink",
+    "docker",
+    "kubernetes",
+    "ai-ml"
+  ],
+  "rules": [
+    "coding-style",
+    "java-springboot",
+    "python-backend-ai",
+    "javascript",
+    "databases",
+    "infra",
+    "git-workflow",
+    "testing",
+    "security"
+  ],
+  "commands": [
+    "plan",
+    "code-review",
+    "tdd",
+    "build-fix",
+    "api-design",
+    "docker-setup",
+    "system-design",
+    "db-schema"
+  ],
+  "agents": [
+    "planner",
+    "code-reviewer",
+    "security-reviewer",
+    "architect",
+    "tdd-guide"
+  ],
+  "skills": [
+    "springboot-patterns",
+    "springboot-security",
+    "springboot-tdd",
+    "java-coding-standards",
+    "jpa-patterns",
+    "postgres-patterns",
+    "python-patterns",
+    "python-testing",
+    "frontend-patterns",
+    "backend-patterns",
+    "iterative-retrieval",
+    "eval-harness",
+    "security-review"
+  ],
+  "hooks": [
+    "block-dangerous-commands",
+    "git-push-reminder",
+    "java-system-out-warning",
+    "java-autowired-warning",
+    "python-print-warning",
+    "js-console-log-warning"
+  ],
+  "mcpServers": [
+    "context7",
+    "memory",
+    "sequential-thinking",
+    "github"
+  ],
+  "examples": [
+    "CLAUDE.md",
+    "CLAUDE-TEMPLATE.md",
+    "sample-springboot-CLAUDE.md"
+  ]
+}

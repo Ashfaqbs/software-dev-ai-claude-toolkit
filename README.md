@@ -1,6 +1,18 @@
 # Software Dev AI Claude Toolkit
 <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/362fbec4-a3f8-463e-aa98-11e50b895815" />
 
+<div align="center">
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Components](https://img.shields.io/badge/components-46-brightgreen.svg)](#whats-inside)
+[![Skills](https://img.shields.io/badge/skills-13-blueviolet.svg)](#skills-13-skill-packs)
+[![Stars](https://img.shields.io/github/stars/Ashfaqbs/software-dev-ai-claude-toolkit?style=social)](https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit)
+[![Forks](https://img.shields.io/github/forks/Ashfaqbs/software-dev-ai-claude-toolkit?style=social)](https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit/network/members)
+
+[Quick Install](#quick-install) &bull; [What's Inside](#whats-inside) &bull; [Rules](#rules-9-files) &bull; [Commands](#slash-commands-8-commands) &bull; [Agents](#agents-5-agents) &bull; [Skills](#skills-13-skill-packs) &bull; [Contributing](CONTRIBUTING.md)
+
+</div>
+
 A production-ready Claude Code configuration for backend-heavy full-stack developers. Pre-configured rules, slash commands, agents, skills, hooks, and MCP servers — covering Java 17 + Spring Boot 3, Python 3.12 + FastAPI, JavaScript (Express.js + React), PostgreSQL, MongoDB, Redis, Kafka, Flink, Docker, Kubernetes, and AI/ML workflows.
 
 Drop it in, run the installer, and Claude Code immediately understands your stack, enforces your standards, and works the way you work.
@@ -57,7 +69,7 @@ The difference is not magic — it's context. This toolkit gives Claude Code the
 
 ### Mac / Linux
 ```bash
-git clone https://github.com/AshfaqSy/software-dev-ai-claude-toolkit.git
+git clone https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit.git
 cd software-dev-ai-claude-toolkit
 chmod +x install.sh
 ./install.sh
@@ -65,7 +77,7 @@ chmod +x install.sh
 
 ### Windows (PowerShell)
 ```powershell
-git clone https://github.com/AshfaqSy/software-dev-ai-claude-toolkit.git
+git clone https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit.git
 cd software-dev-ai-claude-toolkit
 .\install.ps1
 ```
@@ -376,6 +388,10 @@ software-dev-ai-claude-toolkit/
 ```
 
 ---
+
+## Contributing
+
+New rules, commands, agents, or skills are welcome — especially for stacks not covered yet (Go, Rust, .NET, other frontend frameworks). See [CONTRIBUTING.md](CONTRIBUTING.md) for the format each component type follows and how to submit one.
 
 ## Credits
 
