@@ -137,9 +137,8 @@ SELECT pg_reload_conf();
 
 ## Related
 
-- Agent: `database-reviewer` - Full database review workflow
-- Skill: `clickhouse-io` - ClickHouse analytics patterns
 - Skill: `backend-patterns` - API and backend patterns
+- Skill: `jpa-patterns` - Entity design and query optimization on top of these patterns
 
 ---
 

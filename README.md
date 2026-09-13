@@ -1,6 +1,18 @@
 # Software Dev AI Claude Toolkit
 <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/362fbec4-a3f8-463e-aa98-11e50b895815" />
 
+<div align="center">
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Components](https://img.shields.io/badge/components-47-brightgreen.svg)](#whats-inside)
+[![Skills](https://img.shields.io/badge/skills-14-blueviolet.svg)](#skills-14-skill-packs)
+[![Stars](https://img.shields.io/github/stars/Ashfaqbs/software-dev-ai-claude-toolkit?style=social)](https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit)
+[![Forks](https://img.shields.io/github/forks/Ashfaqbs/software-dev-ai-claude-toolkit?style=social)](https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit/network/members)
+
+[Quick Install](#quick-install) &bull; [What's Inside](#whats-inside) &bull; [Rules](#rules-9-files) &bull; [Commands](#slash-commands-8-commands) &bull; [Agents](#agents-5-agents) &bull; [Skills](#skills-14-skill-packs) &bull; [Contributing](CONTRIBUTING.md)
+
+</div>
+
 A production-ready Claude Code configuration for backend-heavy full-stack developers. Pre-configured rules, slash commands, agents, skills, hooks, and MCP servers — covering Java 17 + Spring Boot 3, Python 3.12 + FastAPI, JavaScript (Express.js + React), PostgreSQL, MongoDB, Redis, Kafka, Flink, Docker, Kubernetes, and AI/ML workflows.
 
 Drop it in, run the installer, and Claude Code immediately understands your stack, enforces your standards, and works the way you work.
@@ -20,12 +32,12 @@ Drop it in, run the installer, and Claude Code immediately understands your stac
 | **Rules** | 9 | Coding standards Claude follows on every response |
 | **Slash Commands** | 8 | One-command workflows (`/plan`, `/tdd`, `/code-review`, etc.) |
 | **Agents** | 5 | Specialized AI personas for planning, review, security, architecture, TDD |
-| **Skills** | 13 | Deep domain knowledge packs (Spring Boot, Python, React, PostgreSQL, etc.) |
+| **Skills** | 14 | Deep domain knowledge packs (Spring Boot, Python, React, PostgreSQL, Kafka, etc.) |
 | **Hooks** | 4 | Automated guardrails that run before/after tool use |
 | **MCP Servers** | 4 | External tool integrations (docs lookup, memory, reasoning, GitHub) |
 | **Examples** | 3 | Ready-to-use CLAUDE.md templates for your projects |
 
-**Total: 46 components** working together to make Claude Code act like a senior engineer on your team.
+**Total: 47 components** working together to make Claude Code act like a senior engineer on your team.
 
 ## Before vs After
 
@@ -57,7 +69,7 @@ The difference is not magic — it's context. This toolkit gives Claude Code the
 
 ### Mac / Linux
 ```bash
-git clone https://github.com/AshfaqSy/software-dev-ai-claude-toolkit.git
+git clone https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit.git
 cd software-dev-ai-claude-toolkit
 chmod +x install.sh
 ./install.sh
@@ -65,7 +77,7 @@ chmod +x install.sh
 
 ### Windows (PowerShell)
 ```powershell
-git clone https://github.com/AshfaqSy/software-dev-ai-claude-toolkit.git
+git clone https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit.git
 cd software-dev-ai-claude-toolkit
 .\install.ps1
 ```
@@ -194,7 +206,7 @@ Commands are scripts — they follow a fixed workflow. Agents are thinkers — t
 
 ---
 
-## Skills (13 skill packs)
+## Skills (14 skill packs)
 
 Skills are deep domain knowledge packs that activate contextually. When Claude detects you're working on a Spring Boot project, the relevant skills auto-load to provide patterns, examples, and best practices.
 
@@ -206,6 +218,7 @@ Skills are deep domain knowledge packs that activate contextually. When Claude d
 | `java-coding-standards` | Java | Java 17 idioms, records, sealed classes, pattern matching, Optional usage |
 | `jpa-patterns` | Java/DB | Entity design, relationships, query optimization, transactions, auditing, pagination |
 | `postgres-patterns` | Database | Query optimization, schema design, indexing strategies, security best practices |
+| `kafka-patterns` | Java/Messaging | Spring Kafka producers/consumers, manual offset commits, idempotent consumers, dead letter topics |
 | `python-patterns` | Python | Pythonic idioms, PEP 8, type hints, dataclasses, best practices |
 | `python-testing` | Python | pytest, TDD methodology, fixtures, mocking, parametrization, coverage |
 | `frontend-patterns` | React/JS | React patterns, state management, performance optimization, UI best practices |
@@ -351,13 +364,14 @@ software-dev-ai-claude-toolkit/
 ├── mcp/                               # MCP server configs
 │   └── mcp-servers.json
 │
-├── skills/                            # 13 domain knowledge packs
+├── skills/                            # 14 domain knowledge packs
 │   ├── springboot-patterns/
 │   ├── springboot-security/
 │   ├── springboot-tdd/
 │   ├── java-coding-standards/
 │   ├── jpa-patterns/
 │   ├── postgres-patterns/
+│   ├── kafka-patterns/
 │   ├── python-patterns/
 │   ├── python-testing/
 │   ├── frontend-patterns/
@@ -376,6 +390,10 @@ software-dev-ai-claude-toolkit/
 ```
 
 ---
+
+## Contributing
+
+New rules, commands, agents, or skills are welcome — especially for stacks not covered yet (Go, Rust, .NET, other frontend frameworks). See [CONTRIBUTING.md](CONTRIBUTING.md) for the format each component type follows and how to submit one.
 
 ## Credits
 
