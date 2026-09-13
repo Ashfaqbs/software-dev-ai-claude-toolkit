@@ -52,6 +52,7 @@
     "java-coding-standards",
     "jpa-patterns",
     "postgres-patterns",
+    "kafka-patterns",
     "python-patterns",
     "python-testing",
     "frontend-patterns",
