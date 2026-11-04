@@ -1,9 +1,9 @@
 {
-  "name": "software-dev-ai-claude-toolkit",
+  "name": "ai-coding-agent-toolkit",
   "version": "1.0.0",
   "license": "MIT",
-  "homepage": "https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit",
-  "description": "Production-ready Claude Code configuration for backend-heavy full-stack developers.",
+  "homepage": "https://github.com/Ashfaqbs/ai-coding-agent-toolkit",
+  "description": "Production-ready coding standards and config for AI coding agents (Claude Code, GitHub Copilot, Cursor, Windsurf, OpenCode, and the open AGENTS.md standard) for backend-heavy full-stack developers.",
   "stacks": [
     "java-springboot",
     "python-fastapi",
