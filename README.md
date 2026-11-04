@@ -9,13 +9,13 @@
 [![Stars](https://img.shields.io/github/stars/Ashfaqbs/software-dev-ai-claude-toolkit?style=social)](https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit)
 [![Forks](https://img.shields.io/github/forks/Ashfaqbs/software-dev-ai-claude-toolkit?style=social)](https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit/network/members)
 
-[Quick Install](#quick-install) &bull; [What's Inside](#whats-inside) &bull; [Rules](#rules-9-files) &bull; [Commands](#slash-commands-8-commands) &bull; [Agents](#agents-5-agents) &bull; [Skills](#skills-14-skill-packs) &bull; [Contributing](CONTRIBUTING.md)
+[Quick Install](#quick-install) &bull; [What's Inside](#whats-inside) &bull; [Rules](#rules-9-files) &bull; [Commands](#slash-commands-8-commands) &bull; [Agents](#agents-5-agents) &bull; [Skills](#skills-14-skill-packs) &bull; [Other AI Tools](#other-ai-coding-tools-not-just-claude-code) &bull; [Contributing](CONTRIBUTING.md)
 
 </div>
 
 A production-ready Claude Code configuration for backend-heavy full-stack developers. Pre-configured rules, slash commands, agents, skills, hooks, and MCP servers — covering Java 17 + Spring Boot 3, Python 3.12 + FastAPI, JavaScript (Express.js + React), PostgreSQL, MongoDB, Redis, Kafka, Flink, Docker, Kubernetes, and AI/ML workflows.
 
-Drop it in, run the installer, and Claude Code immediately understands your stack, enforces your standards, and works the way you work.
+Drop it in, run the installer, and Claude Code immediately understands your stack, enforces your standards, and works the way you work. Built Claude-first, but the coding rules underneath aren't Claude-specific — `--ai` exports them for [Copilot, Cursor, Windsurf, OpenCode, and the open AGENTS.md standard](#other-ai-coding-tools-not-just-claude-code) (Codex, Jules, Zed, Warp, Aider, goose, Amp) too.
 
 ## Who This Is For
 
@@ -117,16 +117,30 @@ By default this installs globally to `~/.claude` — every project gets it. Pass
 
 Combine freely with `--stacks`/`-Stacks` — e.g. a repo-local install with only the Java rules/skills, leaving your global `~/.claude` untouched.
 
-### Other AI Tools (GitHub Copilot)
+### Other AI Coding Tools (not just Claude Code)
 
-This toolkit's rules/commands/agents/skills/hooks/MCP model is Claude Code's. Copilot doesn't have direct equivalents for commands, agents, skills, hooks, or this MCP config shape — it mainly reads one repo-level instructions file. Pass `--ai=copilot` / `-Ai copilot` to flatten the selected rules (general + `--stacks`) into `.github/copilot-instructions.md` at the repo root instead of doing a full Claude install:
+This toolkit started as one person's Claude Code setup, but the rules themselves (coding standards for Java/Spring, Python/FastAPI, JS/React, databases, infra, git, testing, security) aren't Claude-specific. `--ai` / `-Ai` exports the selected rules (general + `--stacks`) into whichever tool you actually use:
+
+| `--ai` value | Target tool(s) | What it writes |
+|---|---|---|
+| `claude` (default) | Claude Code | Full install: rules, commands, agents, skills, hooks, MCP config, CLAUDE.md |
+| `copilot` | GitHub Copilot | `.github/copilot-instructions.md` (flattened rules) |
+| `cursor` | Cursor | `.cursor/rules/<id>.mdc` — one file per rule, `alwaysApply: true` frontmatter |
+| `windsurf` | Windsurf | `.windsurf/rules/<id>.md` — one file per rule (warns if a file exceeds Windsurf's ~6,000-char-per-file guidance) |
+| `opencode` | OpenCode | `AGENTS.md` **plus** `.opencode/command/*.md` (commands, copied as-is — same `$ARGUMENTS` convention) and `.opencode/agent/*.md` (agents, as `mode: subagent`) |
+| `agentsmd` | OpenAI Codex, Jules, Zed, Warp, Aider, goose, Amp — and a recognized fallback for Cursor/Windsurf/Copilot too | `AGENTS.md` — the open [agents.md](https://agents.md) standard that all of these already read |
 
 ```bash
-./install.sh --ai=copilot --stacks=python-fastapi   # Mac/Linux
-.\install.ps1 -Ai copilot -Stacks python-fastapi     # Windows
+./install.sh --ai=opencode --stacks=python-fastapi    # Mac/Linux
+.\install.ps1 -Ai opencode -Stacks python-fastapi      # Windows
 ```
 
-This always writes to the current repo regardless of `--local`/global, since Copilot instructions are inherently a repo file. Commands, agents, skills, hooks, and MCP config are skipped for Copilot — printed explicitly, not silently dropped. This is a v1 gap: contributions mapping more of the toolkit to Copilot (or to other AI IDEs like Cursor/Windsurf) are welcome, see [Contributing](CONTRIBUTING.md).
+A few things worth knowing before you reach for one of these:
+
+- **Every non-`claude` target always writes to the current repo**, regardless of `--local`/global — none of these tools have a user-level/global config the way Claude Code does.
+- **Commands, agents, skills, hooks, and MCP config are skipped** for every target except `opencode` (which maps commands and agents too, since it's the one tool here with Claude-like extensibility) — printed explicitly as `SKIPPED`, never silently dropped. This is a v1 gap: contributions deepening any of these, or adding another tool, are welcome — see [Contributing](CONTRIBUTING.md).
+- **There is no `--ai=chatgpt`.** Plain ChatGPT (the chat product) has no repo-level instructions file at all — only OpenAI's coding agent, Codex, does, and that's covered by `--ai=agentsmd`.
+- **Cursor, Windsurf, and Copilot ("coding agent") all read `AGENTS.md` too**, per the standard's own adopter list — so `--ai=agentsmd` is a reasonable single-file choice if you don't need Cursor's per-rule activation modes or don't mind Windsurf's per-file size limit.
 
 ### Manual Install
 
