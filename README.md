@@ -1,4 +1,4 @@
-# Software Dev AI Claude Toolkit
+# AI Coding Agent Toolkit
 <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/362fbec4-a3f8-463e-aa98-11e50b895815" />
 
 <div align="center">
@@ -6,16 +6,16 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Components](https://img.shields.io/badge/components-47-brightgreen.svg)](#whats-inside)
 [![Skills](https://img.shields.io/badge/skills-14-blueviolet.svg)](#skills-14-skill-packs)
-[![Stars](https://img.shields.io/github/stars/Ashfaqbs/software-dev-ai-claude-toolkit?style=social)](https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit)
-[![Forks](https://img.shields.io/github/forks/Ashfaqbs/software-dev-ai-claude-toolkit?style=social)](https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit/network/members)
+[![Stars](https://img.shields.io/github/stars/Ashfaqbs/ai-coding-agent-toolkit?style=social)](https://github.com/Ashfaqbs/ai-coding-agent-toolkit)
+[![Forks](https://img.shields.io/github/forks/Ashfaqbs/ai-coding-agent-toolkit?style=social)](https://github.com/Ashfaqbs/ai-coding-agent-toolkit/network/members)
 
 [Quick Install](#quick-install) &bull; [What's Inside](#whats-inside) &bull; [Rules](#rules-9-files) &bull; [Commands](#slash-commands-8-commands) &bull; [Agents](#agents-5-agents) &bull; [Skills](#skills-14-skill-packs) &bull; [Other AI Tools](#other-ai-coding-tools-not-just-claude-code) &bull; [Contributing](CONTRIBUTING.md)
 
 </div>
 
-A production-ready Claude Code configuration for backend-heavy full-stack developers. Pre-configured rules, slash commands, agents, skills, hooks, and MCP servers — covering Java 17 + Spring Boot 3, Python 3.12 + FastAPI, JavaScript (Express.js + React), PostgreSQL, MongoDB, Redis, Kafka, Flink, Docker, Kubernetes, and AI/ML workflows.
+Production-ready coding standards and config for AI coding agents — backend-heavy full-stack developers. Pre-configured rules, slash commands, agents, skills, hooks, and MCP servers — covering Java 17 + Spring Boot 3, Python 3.12 + FastAPI, JavaScript (Express.js + React), PostgreSQL, MongoDB, Redis, Kafka, Flink, Docker, Kubernetes, and AI/ML workflows.
 
-Drop it in, run the installer, and Claude Code immediately understands your stack, enforces your standards, and works the way you work. Built Claude-first, but the coding rules underneath aren't Claude-specific — `--ai` exports them for [Copilot, Cursor, Windsurf, OpenCode, and the open AGENTS.md standard](#other-ai-coding-tools-not-just-claude-code) (Codex, Jules, Zed, Warp, Aider, goose, Amp) too.
+Drop it in, run the installer, and your AI coding agent of choice immediately understands your stack, enforces your standards, and works the way you work. The full experience (commands, agents, skills, hooks, MCP servers) is built around Claude Code, but the coding rules underneath aren't Claude-specific: `--ai` exports them for [GitHub Copilot, Cursor, Windsurf, OpenCode, and the open AGENTS.md standard](#other-ai-coding-tools-not-just-claude-code) (which also covers OpenAI Codex, Google Jules, Zed, Warp, Aider, goose, and Amp) — pick the one line in [Quick Install](#quick-install) that matches what you actually run.
 
 ## Who This Is For
 
@@ -23,7 +23,7 @@ Drop it in, run the installer, and Claude Code immediately understands your stac
 - Full-stack developers who also touch React frontends
 - Engineers working with PostgreSQL, MongoDB, Redis, Kafka, or Flink
 - Anyone building AI/ML pipelines (RAG, agents, MCP servers, vector databases)
-- Developers who want Claude Code to follow real engineering standards, not generic defaults
+- Developers who want their AI coding agent — Claude Code, Copilot, Cursor, Windsurf, OpenCode, or anything reading AGENTS.md — to follow real engineering standards, not generic defaults
 
 ## What's Inside
 
@@ -69,16 +69,16 @@ The difference is not magic — it's context. This toolkit gives Claude Code the
 
 ### Mac / Linux
 ```bash
-git clone https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit.git
-cd software-dev-ai-claude-toolkit
+git clone https://github.com/Ashfaqbs/ai-coding-agent-toolkit.git
+cd ai-coding-agent-toolkit
 chmod +x install.sh
 ./install.sh
 ```
 
 ### Windows (PowerShell)
 ```powershell
-git clone https://github.com/Ashfaqbs/software-dev-ai-claude-toolkit.git
-cd software-dev-ai-claude-toolkit
+git clone https://github.com/Ashfaqbs/ai-coding-agent-toolkit.git
+cd ai-coding-agent-toolkit
 .\install.ps1
 ```
 
@@ -379,7 +379,7 @@ Delete the file. If you don't use Python, remove `python-backend-ai.md` from rul
 ## Repository Structure
 
 ```
-software-dev-ai-claude-toolkit/
+ai-coding-agent-toolkit/
 ├── README.md
 ├── LICENSE                            # MIT
 ├── .gitignore
