@@ -9,13 +9,13 @@
 [![Stars](https://img.shields.io/github/stars/Ashfaqbs/ai-coding-agent-toolkit?style=social)](https://github.com/Ashfaqbs/ai-coding-agent-toolkit)
 [![Forks](https://img.shields.io/github/forks/Ashfaqbs/ai-coding-agent-toolkit?style=social)](https://github.com/Ashfaqbs/ai-coding-agent-toolkit/network/members)
 
-[Quick Install](#quick-install) &bull; [What's Inside](#whats-inside) &bull; [Rules](#rules-9-files) &bull; [Commands](#slash-commands-8-commands) &bull; [Agents](#agents-5-agents) &bull; [Skills](#skills-14-skill-packs) &bull; [Other AI Tools](#other-ai-coding-tools-not-just-claude-code) &bull; [Contributing](CONTRIBUTING.md)
+[Quick Install](#quick-install) &bull; [What's Inside](#whats-inside) &bull; [Rules](#rules-9-files) &bull; [Commands](#slash-commands-8-commands) &bull; [Agents](#agents-5-agents) &bull; [Skills](#skills-14-skill-packs) &bull; [Other AI Tools](#other-ai-coding-tools) &bull; [Contributing](CONTRIBUTING.md)
 
 </div>
 
 Production-ready coding standards and config for AI coding agents — backend-heavy full-stack developers. Pre-configured rules, slash commands, agents, skills, hooks, and MCP servers — covering Java 17 + Spring Boot 3, Python 3.12 + FastAPI, JavaScript (Express.js + React), PostgreSQL, MongoDB, Redis, Kafka, Flink, Docker, Kubernetes, and AI/ML workflows.
 
-Drop it in, run the installer, and your AI coding agent of choice immediately understands your stack, enforces your standards, and works the way you work. The full experience (commands, agents, skills, hooks, MCP servers) is built around Claude Code, but the coding rules underneath aren't Claude-specific: `--ai` exports them for [GitHub Copilot, Cursor, Windsurf, OpenCode, and the open AGENTS.md standard](#other-ai-coding-tools-not-just-claude-code) (which also covers OpenAI Codex, Google Jules, Zed, Warp, Aider, goose, and Amp) — pick the one line in [Quick Install](#quick-install) that matches what you actually run.
+Drop it in, run the installer, and your AI coding agent of choice immediately understands your stack, enforces your standards, and works the way you work. The full experience (commands, agents, skills, hooks, MCP servers) is built around Claude Code, but the coding rules underneath aren't Claude-specific: `--ai` exports them for [GitHub Copilot, Cursor, Windsurf, OpenCode, and the open AGENTS.md standard](#other-ai-coding-tools) (which also covers OpenAI Codex, Google Jules, Zed, Warp, Aider, goose, and Amp) — pick the one line in [Quick Install](#quick-install) that matches what you actually run.
 
 ## Who This Is For
 
@@ -41,27 +41,28 @@ Drop it in, run the installer, and your AI coding agent of choice immediately un
 
 ## Before vs After
 
-### Before (vanilla Claude Code)
+### Before (vanilla agent, no toolkit)
 ```
 You: "Add a user registration endpoint"
 
-Claude: *generates a basic endpoint with no validation, no error handling,
-        uses field injection, no tests, hardcoded values, no consideration
-        for your existing project patterns*
+Agent: *generates a basic endpoint with no validation, no error handling,
+       uses field injection, no tests, hardcoded values, no consideration
+       for your existing project patterns*
 ```
 
 ### After (with this toolkit)
 ```
 You: "Add a user registration endpoint"
 
-Claude: *reads your project's CLAUDE.md, follows your naming conventions,
-        uses constructor injection, adds @Valid with proper DTOs, writes
-        Flyway migration, includes unit + integration tests with Testcontainers,
-        uses your custom exception hierarchy, follows your git commit format,
-        and warns you about the missing rate limiter*
+Agent: *reads your project's rules (CLAUDE.md/AGENTS.md/whichever your tool
+       reads), follows your naming conventions, uses constructor injection,
+       adds @Valid with proper DTOs, writes a Flyway migration, includes
+       unit + integration tests with Testcontainers, uses your custom
+       exception hierarchy, follows your git commit format, and warns you
+       about the missing rate limiter*
 ```
 
-The difference is not magic — it's context. This toolkit gives Claude Code the same context you'd give a new developer joining your team.
+The difference is not magic — it's context. This toolkit gives whichever agent you use the same context you'd give a new developer joining your team. (The example above shows Claude Code's exact behavior with this toolkit installed; the same rules exported via `--ai` get you the same context in Copilot, Cursor, Windsurf, or OpenCode.)
 
 ---
 
@@ -117,7 +118,7 @@ By default this installs globally to `~/.claude` — every project gets it. Pass
 
 Combine freely with `--stacks`/`-Stacks` — e.g. a repo-local install with only the Java rules/skills, leaving your global `~/.claude` untouched.
 
-### Other AI Coding Tools (not just Claude Code)
+### Other AI Coding Tools
 
 This toolkit started as one person's Claude Code setup, but the rules themselves (coding standards for Java/Spring, Python/FastAPI, JS/React, databases, infra, git, testing, security) aren't Claude-specific. `--ai` / `-Ai` exports the selected rules (general + `--stacks`) into whichever tool you actually use:
 
