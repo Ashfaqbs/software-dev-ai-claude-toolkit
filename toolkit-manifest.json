@@ -24,6 +24,19 @@
     "javascript-react": "Express.js + React rules and skills",
     "ai-ml": "RAG/agent/MCP skill packs not tied to a specific language stack"
   },
+  "installScopes": {
+    "global": "Default. Installs to ~/.claude (all projects) plus ~/.claude/CLAUDE.md and ~/.claude/.mcp.json.",
+    "local": "Opt-in via --local/-Local. Installs to ./.claude in the current repo, plus ./CLAUDE.md (from the blank project template, not the personal one) and ./.mcp.json at the project root."
+  },
+  "aiTargets": {
+    "claude": "Default. Full install: rules, commands, agents, skills, hooks, MCP config, CLAUDE.md.",
+    "copilot": "Flattens the selected rules into .github/copilot-instructions.md at the project root.",
+    "agentsmd": "Flattens the selected rules into AGENTS.md at the project root — the open AGENTS.md standard, read by OpenAI Codex, OpenCode, Google Jules, Zed, Warp, Aider, goose, Amp, and used as a fallback by Cursor/Windsurf/Copilot too.",
+    "cursor": "Writes one .cursor/rules/<id>.mdc per selected rule, with alwaysApply: true frontmatter.",
+    "windsurf": "Writes one .windsurf/rules/<id>.md per selected rule; warns if a file exceeds Windsurf's ~6000-char-per-file guidance.",
+    "opencode": "Writes AGENTS.md (same as agentsmd) plus maps commands to .opencode/command/*.md (as-is, same $ARGUMENTS convention) and agents to .opencode/agent/*.md (mode: subagent; model/tools fields dropped since OpenCode's model ids differ from Claude's)."
+  },
+  "aiTargetsNote": "Every non-claude target skips skills, hooks, and MCP config (no equivalent in v1 — a documented gap, not a silent drop) and always writes to the current directory regardless of --local/global, since none of these tools have a global/user-level config the way Claude Code does. Plain ChatGPT (not Codex) has no repo-level instructions file at all, so there is no --ai=chatgpt target.",
   "rules": [
     { "id": "coding-style", "group": "general" },
     { "id": "java-springboot", "group": "java-springboot" },
