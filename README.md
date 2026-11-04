@@ -106,6 +106,28 @@ Groups: `general` (coding style, git workflow, testing, security, databases, inf
 
 Don't use any of the three languages this toolkit ships rules for? Install with `--stacks=` (no stack named) to get just the general rules/commands/agents, then add your own stack's rules/skills under `~/.claude/rules/` and `~/.claude/skills/` — see [Contributing](CONTRIBUTING.md) for the format, especially if you'd rather submit it back for others on your stack.
 
+### Global vs. Project-Local Install
+
+By default this installs globally to `~/.claude` — every project gets it. Pass `--local` / `-Local` to scope the install to the current repo instead (`./.claude/`, `./CLAUDE.md` from the blank project template, `./.mcp.json` at the repo root):
+
+```bash
+./install.sh --local --stacks=java-springboot      # Mac/Linux
+.\install.ps1 -Local -Stacks java-springboot        # Windows
+```
+
+Combine freely with `--stacks`/`-Stacks` — e.g. a repo-local install with only the Java rules/skills, leaving your global `~/.claude` untouched.
+
+### Other AI Tools (GitHub Copilot)
+
+This toolkit's rules/commands/agents/skills/hooks/MCP model is Claude Code's. Copilot doesn't have direct equivalents for commands, agents, skills, hooks, or this MCP config shape — it mainly reads one repo-level instructions file. Pass `--ai=copilot` / `-Ai copilot` to flatten the selected rules (general + `--stacks`) into `.github/copilot-instructions.md` at the repo root instead of doing a full Claude install:
+
+```bash
+./install.sh --ai=copilot --stacks=python-fastapi   # Mac/Linux
+.\install.ps1 -Ai copilot -Stacks python-fastapi     # Windows
+```
+
+This always writes to the current repo regardless of `--local`/global, since Copilot instructions are inherently a repo file. Commands, agents, skills, hooks, and MCP config are skipped for Copilot — printed explicitly, not silently dropped. This is a v1 gap: contributions mapping more of the toolkit to Copilot (or to other AI IDEs like Cursor/Windsurf) are welcome, see [Contributing](CONTRIBUTING.md).
+
 ### Manual Install
 
 If you prefer to cherry-pick, copy individual folders to `~/.claude/`:

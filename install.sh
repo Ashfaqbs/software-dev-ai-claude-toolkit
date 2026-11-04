@@ -3,17 +3,57 @@ set -euo pipefail
 
 # software-dev-ai-claude-toolkit installer (Mac/Linux)
 # Copies rules, commands, agents, skills, hooks, and MCP config to ~/.claude/
+# by default.
 #
-# By default installs everything. Pass --stacks=<group,group,...> to install
-# only "general" (cross-stack) components plus the stacks you name, e.g.:
-#   ./install.sh --stacks=python-fastapi,ai-ml
-# Run ./install.sh --list to see available groups. Requires Node.js for
-# filtering; without Node, --stacks is ignored and everything is installed.
+# Flags:
+#   --stacks=<group,group,...>  Install only "general" (cross-stack) components
+#                                plus the stacks you name, e.g.:
+#                                  ./install.sh --stacks=python-fastapi,ai-ml
+#                                Requires Node.js; without it, --stacks is
+#                                ignored and everything is installed.
+#   --local                     Install into ./.claude in the current directory
+#                                (project-scoped) instead of ~/.claude (global,
+#                                the default). Also installs ./CLAUDE.md (blank
+#                                project template) and ./.mcp.json here instead
+#                                of under ~/.claude.
+#   --ai=claude|copilot          Target AI tool. Default: claude (full install).
+#                                copilot flattens the selected rules into
+#                                .github/copilot-instructions.md at the project
+#                                root; commands/agents/skills/hooks/MCP are
+#                                skipped (no Copilot equivalent yet).
+#   --list                      Print available --stacks groups and exit.
 
-CLAUDE_DIR="$HOME/.claude"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 STACKS_ARG=""
 LIST_ONLY=false
+LOCAL_INSTALL=false
+AI_TARGET="claude"
+
+for arg in "$@"; do
+    case "$arg" in
+        --stacks=*)
+            STACKS_ARG="${arg#--stacks=}"
+            ;;
+        --local)
+            LOCAL_INSTALL=true
+            ;;
+        --ai=*)
+            AI_TARGET="${arg#--ai=}"
+            ;;
+        --list)
+            LIST_ONLY=true
+            ;;
+        *)
+            echo "Unknown option: $arg" >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [ "$AI_TARGET" != "claude" ] && [ "$AI_TARGET" != "copilot" ]; then
+    echo "Unknown --ai target: $AI_TARGET (expected 'claude' or 'copilot')" >&2
+    exit 1
+fi
 
 # On git-bash/MSYS (common on Windows), $PWD-derived paths look like
 # /c/tmp/... which Node's require()/fs on native Windows cannot resolve.
@@ -30,48 +70,31 @@ to_native_path() {
 }
 NODE_SCRIPT_DIR="$(to_native_path "$SCRIPT_DIR")"
 
-for arg in "$@"; do
-    case "$arg" in
-        --stacks=*)
-            STACKS_ARG="${arg#--stacks=}"
-            ;;
-        --list)
-            LIST_ONLY=true
-            ;;
-        *)
-            echo "Unknown option: $arg" >&2
-            exit 1
-            ;;
-    esac
-done
-
 if [ "$LIST_ONLY" = true ]; then
     if command -v node &>/dev/null; then
         node -e "
 const m = require('$NODE_SCRIPT_DIR/toolkit-manifest.json');
-console.log('Available install groups:');
+console.log('Available --stacks groups:');
 for (const [g, desc] of Object.entries(m.installGroups)) {
     console.log('  ' + g + ' - ' + desc);
 }
+console.log('');
+console.log('Available --ai targets:');
+for (const [t, desc] of Object.entries(m.aiTargets)) {
+    console.log('  ' + t + ' - ' + desc);
+}
 "
     else
-        echo "Node.js is required for --list. Available groups: general, java-springboot, python-fastapi, javascript-react, ai-ml"
+        echo "Node.js is required for --list. Groups: general, java-springboot, python-fastapi, javascript-react, ai-ml. AI targets: claude, copilot."
     fi
     exit 0
 fi
 
-echo "=== Software Dev AI Claude Toolkit - Installer ==="
-echo ""
-echo "This will install Claude Code configurations to: $CLAUDE_DIR"
-if [ -n "$STACKS_ARG" ]; then
-    echo "Stack filter: general + $STACKS_ARG"
-fi
-echo ""
-
-# Check if ~/.claude exists
-if [ ! -d "$CLAUDE_DIR" ]; then
-    echo "Creating $CLAUDE_DIR..."
-    mkdir -p "$CLAUDE_DIR"
+PROJECT_ROOT="$(pwd)"
+if [ "$LOCAL_INSTALL" = true ]; then
+    CLAUDE_DIR="$PROJECT_ROOT/.claude"
+else
+    CLAUDE_DIR="$HOME/.claude"
 fi
 
 HAVE_NODE=false
@@ -96,6 +119,69 @@ for (const entry of m['$type']) {
 }
 "
 }
+
+# === Copilot path: flatten selected rules into .github/copilot-instructions.md,
+# skip everything else, and exit. Always writes to the current directory,
+# regardless of --local, since Copilot instructions are inherently a repo file.
+if [ "$AI_TARGET" = "copilot" ]; then
+    echo "=== Software Dev AI Claude Toolkit - Installer (Copilot target) ==="
+    echo ""
+    if [ "$HAVE_NODE" = false ]; then
+        echo "ERROR: --ai=copilot requires Node.js to flatten rules." >&2
+        exit 1
+    fi
+    DEST_DIR="$PROJECT_ROOT/.github"
+    DEST_FILE="$DEST_DIR/copilot-instructions.md"
+    mkdir -p "$DEST_DIR"
+    if [ -f "$DEST_FILE" ]; then
+        cp "$DEST_FILE" "$DEST_FILE.backup.$(date +%Y%m%d%H%M%S)"
+        echo "  BACKUP: copilot-instructions.md"
+    fi
+
+    RULE_IDS="$(filtered_ids rules)"
+    {
+        echo "<!-- Generated by software-dev-ai-claude-toolkit install.sh --ai=copilot -->"
+        echo "<!-- Source rules flattened below; edit freely, this is a one-time export -->"
+        echo ""
+        while IFS= read -r id; do
+            [ -z "$id" ] && continue
+            if [ -f "$SCRIPT_DIR/rules/$id.md" ]; then
+                echo "## Rule: $id"
+                echo ""
+                cat "$SCRIPT_DIR/rules/$id.md"
+                echo ""
+                echo "---"
+                echo ""
+            fi
+        done <<< "$RULE_IDS"
+    } > "$DEST_FILE"
+
+    echo "  OK: .github/copilot-instructions.md (flattened from rules)"
+    echo ""
+    echo "  SKIPPED (no Copilot equivalent in v1): commands, agents, skills, hooks, MCP config"
+    echo ""
+    echo "=== Installation Complete ==="
+    exit 0
+fi
+
+# === Claude path (default) ===
+
+echo "=== Software Dev AI Claude Toolkit - Installer ==="
+echo ""
+if [ "$LOCAL_INSTALL" = true ]; then
+    echo "This will install Claude Code configurations to: $CLAUDE_DIR (project-local)"
+else
+    echo "This will install Claude Code configurations to: $CLAUDE_DIR (global)"
+fi
+if [ -n "$STACKS_ARG" ]; then
+    echo "Stack filter: general + $STACKS_ARG"
+fi
+echo ""
+
+if [ ! -d "$CLAUDE_DIR" ]; then
+    echo "Creating $CLAUDE_DIR..."
+    mkdir -p "$CLAUDE_DIR"
+fi
 
 # Function to copy a directory with backup, optionally restricted to a set of
 # top-level file/dir names (one per line on stdin via $4, empty = copy all)
@@ -180,7 +266,7 @@ copy_dir "$SCRIPT_DIR/agents" "$CLAUDE_DIR/agents" "agents (5 agents)" ""
 # Skills
 copy_dir "$SCRIPT_DIR/skills" "$CLAUDE_DIR/skills" "skills (14 skill packs)" "$SKILLS_IDS"
 
-# Hooks — merge into existing settings.json
+# Hooks — merge into existing settings.json (same relative position for both scopes)
 if [ -f "$SCRIPT_DIR/hooks/settings.json" ]; then
     if [ "$HAVE_NODE" = true ]; then
         NODE_CLAUDE_DIR="$(to_native_path "$CLAUDE_DIR")"
@@ -203,25 +289,38 @@ fs.writeFileSync(destPath, JSON.stringify(dest, null, 2));
     fi
 fi
 
-# MCP servers
+# MCP servers — global: ~/.claude/.mcp.json; local: ./.mcp.json at project root
+if [ "$LOCAL_INSTALL" = true ]; then
+    MCP_DEST="$PROJECT_ROOT/.mcp.json"
+else
+    MCP_DEST="$CLAUDE_DIR/.mcp.json"
+fi
 if [ -f "$SCRIPT_DIR/mcp/mcp-servers.json" ]; then
-    mkdir -p "$CLAUDE_DIR"
-    if [ -f "$CLAUDE_DIR/.mcp.json" ]; then
-        cp "$CLAUDE_DIR/.mcp.json" "$CLAUDE_DIR/.mcp.json.backup.$(date +%Y%m%d%H%M%S)"
-        echo "  BACKUP: .mcp.json"
+    if [ -f "$MCP_DEST" ]; then
+        cp "$MCP_DEST" "$MCP_DEST.backup.$(date +%Y%m%d%H%M%S)"
+        echo "  BACKUP: $(basename "$MCP_DEST")"
     fi
-    cp "$SCRIPT_DIR/mcp/mcp-servers.json" "$CLAUDE_DIR/.mcp.json"
+    cp "$SCRIPT_DIR/mcp/mcp-servers.json" "$MCP_DEST"
     echo "  OK: MCP servers (4 servers configured)"
     echo ""
-    echo "  NOTE: Edit ~/.claude/.mcp.json and replace <YOUR_GITHUB_TOKEN>"
+    echo "  NOTE: Edit $MCP_DEST and replace <YOUR_GITHUB_TOKEN>"
     echo "        with your GitHub personal access token."
 fi
 
-# CLAUDE.md — only install if not present
-if [ ! -f "$CLAUDE_DIR/CLAUDE.md" ]; then
-    if [ -f "$SCRIPT_DIR/examples/CLAUDE.md" ]; then
-        cp "$SCRIPT_DIR/examples/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
-        echo "  OK: CLAUDE.md (installed example — customize it!)"
+# CLAUDE.md — global: ~/.claude/CLAUDE.md from the personal template;
+# local: ./CLAUDE.md at project root from the blank project template.
+# Only install if not present either way.
+if [ "$LOCAL_INSTALL" = true ]; then
+    CLAUDE_MD_DEST="$PROJECT_ROOT/CLAUDE.md"
+    CLAUDE_MD_SRC="$SCRIPT_DIR/examples/CLAUDE-TEMPLATE.md"
+else
+    CLAUDE_MD_DEST="$CLAUDE_DIR/CLAUDE.md"
+    CLAUDE_MD_SRC="$SCRIPT_DIR/examples/CLAUDE.md"
+fi
+if [ ! -f "$CLAUDE_MD_DEST" ]; then
+    if [ -f "$CLAUDE_MD_SRC" ]; then
+        cp "$CLAUDE_MD_SRC" "$CLAUDE_MD_DEST"
+        echo "  OK: CLAUDE.md (installed $(basename "$CLAUDE_MD_SRC") — customize it!)"
     fi
 else
     echo "  SKIP: CLAUDE.md (already exists, not overwriting)"
@@ -243,7 +342,13 @@ fi
 echo "  - 4 code quality hooks (block dangerous commands, warn on print/console.log/System.out)"
 echo "  - 4 MCP servers (context7, memory, sequential-thinking, github)"
 echo ""
+if [ "$LOCAL_INSTALL" = true ]; then
+    echo "Installed project-locally in: $PROJECT_ROOT"
+else
+    echo "Installed globally in: $CLAUDE_DIR"
+fi
+echo ""
 echo "Next steps:"
-echo "  1. Customize ~/.claude/CLAUDE.md with your personal preferences"
-echo "  2. Add your GitHub token to ~/.claude/.mcp.json"
+echo "  1. Customize $CLAUDE_MD_DEST with your preferences"
+echo "  2. Add your GitHub token to $MCP_DEST"
 echo "  3. Start Claude Code in any project and enjoy!"

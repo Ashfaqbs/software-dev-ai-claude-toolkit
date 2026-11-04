@@ -24,6 +24,14 @@
     "javascript-react": "Express.js + React rules and skills",
     "ai-ml": "RAG/agent/MCP skill packs not tied to a specific language stack"
   },
+  "installScopes": {
+    "global": "Default. Installs to ~/.claude (all projects) plus ~/.claude/CLAUDE.md and ~/.claude/.mcp.json.",
+    "local": "Opt-in via --local/-Local. Installs to ./.claude in the current repo, plus ./CLAUDE.md (from the blank project template, not the personal one) and ./.mcp.json at the project root."
+  },
+  "aiTargets": {
+    "claude": "Default. Full install: rules, commands, agents, skills, hooks, MCP config, CLAUDE.md.",
+    "copilot": "Opt-in via --ai=copilot/-Ai copilot. Flattens the selected rules (general + --stacks) into .github/copilot-instructions.md at the project root. Commands, agents, skills, hooks, and MCP config are skipped — Copilot has no equivalent yet; this is a known v1 gap, not a silent drop. Always writes to the current directory regardless of --local/global."
+  },
   "rules": [
     { "id": "coding-style", "group": "general" },
     { "id": "java-springboot", "group": "java-springboot" },
