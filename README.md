@@ -88,6 +88,24 @@ The installer:
 - Merges hooks into your existing `settings.json`
 - Skips `CLAUDE.md` if you already have one (won't overwrite your personal config)
 
+### Selective Install (pick only the stacks you use)
+
+By default the installer copies everything. If you don't use Java/Spring Boot, Python, or JS/React, install only the cross-stack rules/skills plus the stack(s) you actually use:
+
+```bash
+# Mac/Linux — see available groups
+./install.sh --list
+./install.sh --stacks=python-fastapi,ai-ml
+
+# Windows (PowerShell)
+.\install.ps1 -ListGroups
+.\install.ps1 -Stacks python-fastapi,ai-ml
+```
+
+Groups: `general` (coding style, git workflow, testing, security, databases, infra, all slash commands, all agents — always installed), `java-springboot`, `python-fastapi`, `javascript-react`, `ai-ml`. Slash commands and agents are stack-neutral and always installed in full; only `rules/` and `skills/` are filtered. Filtering requires Node.js on Mac/Linux (falls back to installing everything if missing); the PowerShell installer filters natively.
+
+Don't use any of the three languages this toolkit ships rules for? Install with `--stacks=` (no stack named) to get just the general rules/commands/agents, then add your own stack's rules/skills under `~/.claude/rules/` and `~/.claude/skills/` — see [Contributing](CONTRIBUTING.md) for the format, especially if you'd rather submit it back for others on your stack.
+
 ### Manual Install
 
 If you prefer to cherry-pick, copy individual folders to `~/.claude/`:

@@ -7,17 +7,17 @@
     },
     "memory": {
       "command": "npx",
-      "args": ["-y", "@anthropic/claude-memory-mcp"],
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
       "description": "Persistent memory across sessions — remembers project decisions, preferences, and context"
     },
     "sequential-thinking": {
       "command": "npx",
-      "args": ["-y", "@anthropic/sequential-thinking-mcp"],
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
       "description": "Step-by-step reasoning for complex problems — system design, debugging, architecture decisions"
     },
     "github": {
       "command": "npx",
-      "args": ["-y", "@anthropic/github-mcp"],
+      "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
         "GITHUB_TOKEN": "<YOUR_GITHUB_TOKEN>"
       },

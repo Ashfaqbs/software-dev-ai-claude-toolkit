@@ -4,7 +4,13 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added
+- Selective install: `toolkit-manifest.json` now tags every rule and skill with an `installGroup` (`general`, `java-springboot`, `python-fastapi`, `javascript-react`, `ai-ml`). `install.sh --stacks=<groups>` / `install.ps1 -Stacks <groups>` install only `general` plus the named groups, so a dev on a stack this toolkit doesn't ship rules for (Go, Rust, .NET, ...) can install just the stack-neutral core (commands, agents, general rules) and layer their own stack's rules/skills on top instead of inheriting Java/Python/JS-specific content. `--list` / `-ListGroups` shows available groups. Default (no flag) is unchanged — installs everything, exactly as before.
+- `install.sh` path handling: converts script/install paths via `cygpath -m` before handing them to `node -e` when available, fixing a pre-existing crash when the installer is run under git-bash/MSYS on Windows (Node on native Windows can't resolve `/c/...`-style POSIX paths, and a raw `cygpath -w` backslash path corrupts when embedded in a JS string literal, e.g. `\t`).
+
 ### Fixed
+- `mcp/mcp-servers.json` pointed `memory`, `sequential-thinking`, and `github` at nonexistent npm packages (`@anthropic/claude-memory-mcp`, `@anthropic/sequential-thinking-mcp`, `@anthropic/github-mcp`) — `npx` would 404 on all three. Switched to the real published packages under `@modelcontextprotocol/*`.
+- `install.sh` / `install.ps1` still said "13 skill packs" after `kafka-patterns` was added, undercounting the actual 14 skills already reflected in `README.md` and `toolkit-manifest.json`.
 - `README.md` Quick Install commands pointed to a nonexistent GitHub account (`AshfaqSy`) instead of the actual repo owner (`Ashfaqbs`), breaking `git clone` for anyone following the Mac/Linux or Windows install steps.
 - `skills/postgres-patterns/SKILL.md` linked to a `database-reviewer` agent and a `clickhouse-io` skill that don't exist anywhere in this toolkit.
 

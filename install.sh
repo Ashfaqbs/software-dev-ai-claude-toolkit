@@ -3,13 +3,69 @@ set -euo pipefail
 
 # software-dev-ai-claude-toolkit installer (Mac/Linux)
 # Copies rules, commands, agents, skills, hooks, and MCP config to ~/.claude/
+#
+# By default installs everything. Pass --stacks=<group,group,...> to install
+# only "general" (cross-stack) components plus the stacks you name, e.g.:
+#   ./install.sh --stacks=python-fastapi,ai-ml
+# Run ./install.sh --list to see available groups. Requires Node.js for
+# filtering; without Node, --stacks is ignored and everything is installed.
 
 CLAUDE_DIR="$HOME/.claude"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+STACKS_ARG=""
+LIST_ONLY=false
+
+# On git-bash/MSYS (common on Windows), $PWD-derived paths look like
+# /c/tmp/... which Node's require()/fs on native Windows cannot resolve.
+# Convert to a Windows path with forward slashes (cygpath -m) for anything
+# handed to `node -e` when cygpath is available — forward slashes avoid
+# backslash-escape corruption (e.g. \t) when the path is embedded in a JS
+# string literal; elsewhere this is a no-op.
+to_native_path() {
+    if command -v cygpath &>/dev/null; then
+        cygpath -m "$1"
+    else
+        echo "$1"
+    fi
+}
+NODE_SCRIPT_DIR="$(to_native_path "$SCRIPT_DIR")"
+
+for arg in "$@"; do
+    case "$arg" in
+        --stacks=*)
+            STACKS_ARG="${arg#--stacks=}"
+            ;;
+        --list)
+            LIST_ONLY=true
+            ;;
+        *)
+            echo "Unknown option: $arg" >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [ "$LIST_ONLY" = true ]; then
+    if command -v node &>/dev/null; then
+        node -e "
+const m = require('$NODE_SCRIPT_DIR/toolkit-manifest.json');
+console.log('Available install groups:');
+for (const [g, desc] of Object.entries(m.installGroups)) {
+    console.log('  ' + g + ' - ' + desc);
+}
+"
+    else
+        echo "Node.js is required for --list. Available groups: general, java-springboot, python-fastapi, javascript-react, ai-ml"
+    fi
+    exit 0
+fi
 
 echo "=== Software Dev AI Claude Toolkit - Installer ==="
 echo ""
 echo "This will install Claude Code configurations to: $CLAUDE_DIR"
+if [ -n "$STACKS_ARG" ]; then
+    echo "Stack filter: general + $STACKS_ARG"
+fi
 echo ""
 
 # Check if ~/.claude exists
@@ -18,11 +74,36 @@ if [ ! -d "$CLAUDE_DIR" ]; then
     mkdir -p "$CLAUDE_DIR"
 fi
 
-# Function to copy a directory with backup
+HAVE_NODE=false
+if command -v node &>/dev/null; then
+    HAVE_NODE=true
+fi
+
+if [ -n "$STACKS_ARG" ] && [ "$HAVE_NODE" = false ]; then
+    echo "  WARN: --stacks requires Node.js, which was not found. Installing everything instead."
+    STACKS_ARG=""
+fi
+
+# Given a component type (rules|skills) and a manifest, print the ids that
+# belong to "general" or one of the requested stacks, one per line.
+filtered_ids() {
+    local type="$1"
+    node -e "
+const m = require('$NODE_SCRIPT_DIR/toolkit-manifest.json');
+const wanted = new Set(['general', ...'$STACKS_ARG'.split(',').map(s => s.trim()).filter(Boolean)]);
+for (const entry of m['$type']) {
+    if (wanted.has(entry.group)) console.log(entry.id);
+}
+"
+}
+
+# Function to copy a directory with backup, optionally restricted to a set of
+# top-level file/dir names (one per line on stdin via $4, empty = copy all)
 copy_dir() {
     local src="$1"
     local dest="$2"
     local name="$3"
+    local only_ids="$4" # newline-separated ids, or empty for "copy everything"
 
     if [ ! -d "$src" ]; then
         echo "  SKIP: $name (source not found)"
@@ -35,8 +116,25 @@ copy_dir() {
         mkdir -p "$dest"
     fi
 
-    cp -r "$src"/* "$dest"/ 2>/dev/null || true
-    echo "  OK: $name"
+    if [ -z "$only_ids" ]; then
+        cp -r "$src"/* "$dest"/ 2>/dev/null || true
+        echo "  OK: $name"
+        return
+    fi
+
+    local copied=0
+    while IFS= read -r id; do
+        [ -z "$id" ] && continue
+        if [ -f "$src/$id.md" ]; then
+            cp "$src/$id.md" "$dest/"
+            copied=$((copied + 1))
+        elif [ -d "$src/$id" ]; then
+            mkdir -p "$dest/$id"
+            cp -r "$src/$id"/* "$dest/$id"/ 2>/dev/null || true
+            copied=$((copied + 1))
+        fi
+    done <<< "$only_ids"
+    echo "  OK: $name ($copied installed for selected stacks)"
 }
 
 # Function to copy a file with backup
@@ -63,25 +161,33 @@ copy_file() {
 echo "Installing components..."
 echo ""
 
+RULES_IDS=""
+SKILLS_IDS=""
+if [ -n "$STACKS_ARG" ]; then
+    RULES_IDS="$(filtered_ids rules)"
+    SKILLS_IDS="$(filtered_ids skills)"
+fi
+
 # Rules
-copy_dir "$SCRIPT_DIR/rules" "$CLAUDE_DIR/rules" "rules (9 files)"
+copy_dir "$SCRIPT_DIR/rules" "$CLAUDE_DIR/rules" "rules (9 files)" "$RULES_IDS"
 
-# Commands
-copy_dir "$SCRIPT_DIR/commands" "$CLAUDE_DIR/commands" "commands (8 slash commands)"
+# Commands (always installed — not stack-specific)
+copy_dir "$SCRIPT_DIR/commands" "$CLAUDE_DIR/commands" "commands (8 slash commands)" ""
 
-# Agents
-copy_dir "$SCRIPT_DIR/agents" "$CLAUDE_DIR/agents" "agents (5 agents)"
+# Agents (always installed — not stack-specific)
+copy_dir "$SCRIPT_DIR/agents" "$CLAUDE_DIR/agents" "agents (5 agents)" ""
 
 # Skills
-copy_dir "$SCRIPT_DIR/skills" "$CLAUDE_DIR/skills" "skills (13 skill packs)"
+copy_dir "$SCRIPT_DIR/skills" "$CLAUDE_DIR/skills" "skills (14 skill packs)" "$SKILLS_IDS"
 
 # Hooks — merge into existing settings.json
 if [ -f "$SCRIPT_DIR/hooks/settings.json" ]; then
-    if command -v node &>/dev/null; then
+    if [ "$HAVE_NODE" = true ]; then
+        NODE_CLAUDE_DIR="$(to_native_path "$CLAUDE_DIR")"
         node -e "
 const fs = require('fs');
-const src = JSON.parse(fs.readFileSync('$SCRIPT_DIR/hooks/settings.json', 'utf8'));
-const destPath = '$CLAUDE_DIR/settings.json';
+const src = JSON.parse(fs.readFileSync('$NODE_SCRIPT_DIR/hooks/settings.json', 'utf8'));
+const destPath = '$NODE_CLAUDE_DIR/settings.json';
 let dest = {};
 if (fs.existsSync(destPath)) {
     dest = JSON.parse(fs.readFileSync(destPath, 'utf8'));
@@ -125,10 +231,15 @@ echo ""
 echo "=== Installation Complete ==="
 echo ""
 echo "What was installed:"
-echo "  - 9 coding rules (coding style, Java, Python, JS, DBs, infra, git, testing, security)"
-echo "  - 8 slash commands (/plan, /code-review, /tdd, /build-fix, /api-design, /docker-setup, /system-design, /db-schema)"
-echo "  - 5 specialized agents (planner, code-reviewer, security-reviewer, architect, tdd-guide)"
-echo "  - 13 skill packs (Spring Boot, Python, React, PostgreSQL, JPA, security, and more)"
+if [ -n "$STACKS_ARG" ]; then
+    echo "  - general rules/skills + stacks: $STACKS_ARG"
+    echo "  - 8 slash commands, 5 agents (always installed, stack-neutral)"
+else
+    echo "  - 9 coding rules (coding style, Java, Python, JS, DBs, infra, git, testing, security)"
+    echo "  - 8 slash commands (/plan, /code-review, /tdd, /build-fix, /api-design, /docker-setup, /system-design, /db-schema)"
+    echo "  - 5 specialized agents (planner, code-reviewer, security-reviewer, architect, tdd-guide)"
+    echo "  - 14 skill packs (Spring Boot, Python, React, PostgreSQL, JPA, Kafka, security, and more)"
+fi
 echo "  - 4 code quality hooks (block dangerous commands, warn on print/console.log/System.out)"
 echo "  - 4 MCP servers (context7, memory, sequential-thinking, github)"
 echo ""
