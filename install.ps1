@@ -1,14 +1,36 @@
 # software-dev-ai-claude-toolkit installer (Windows PowerShell)
 # Copies rules, commands, agents, skills, hooks, and MCP config to ~/.claude/
+#
+# By default installs everything. Pass -Stacks to install only "general"
+# (cross-stack) components plus the stacks you name, e.g.:
+#   .\install.ps1 -Stacks python-fastapi,ai-ml
+# Run .\install.ps1 -ListGroups to see available groups.
+
+param(
+    [string[]]$Stacks = @(),
+    [switch]$ListGroups
+)
 
 $ErrorActionPreference = "Stop"
 
 $ClaudeDir = "$env:USERPROFILE\.claude"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$Manifest = Get-Content "$ScriptDir\toolkit-manifest.json" -Raw | ConvertFrom-Json
+
+if ($ListGroups) {
+    Write-Host "Available install groups:"
+    foreach ($prop in $Manifest.installGroups.PSObject.Properties) {
+        Write-Host "  $($prop.Name) - $($prop.Value)"
+    }
+    exit 0
+}
 
 Write-Host "=== Software Dev AI Claude Toolkit - Installer ===" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "This will install Claude Code configurations to: $ClaudeDir"
+if ($Stacks.Count -gt 0) {
+    Write-Host "Stack filter: general + $($Stacks -join ',')"
+}
 Write-Host ""
 
 # Create ~/.claude if needed
@@ -17,8 +39,21 @@ if (-not (Test-Path $ClaudeDir)) {
     New-Item -ItemType Directory -Path $ClaudeDir -Force | Out-Null
 }
 
+function Get-FilteredIds {
+    param([string]$ComponentType, [string[]]$WantedStacks)
+
+    $wanted = @("general") + $WantedStacks
+    $result = @()
+    foreach ($entry in $Manifest.$ComponentType) {
+        if ($wanted -contains $entry.group) {
+            $result += $entry.id
+        }
+    }
+    return $result
+}
+
 function Copy-DirectoryMerge {
-    param([string]$Source, [string]$Destination, [string]$Name)
+    param([string]$Source, [string]$Destination, [string]$Name, [string[]]$OnlyIds = @())
 
     if (-not (Test-Path $Source)) {
         Write-Host "  SKIP: $Name (source not found)" -ForegroundColor Yellow
@@ -31,8 +66,27 @@ function Copy-DirectoryMerge {
         New-Item -ItemType Directory -Path $Destination -Force | Out-Null
     }
 
-    Copy-Item -Path "$Source\*" -Destination $Destination -Recurse -Force
-    Write-Host "  OK: $Name" -ForegroundColor Green
+    if ($OnlyIds.Count -eq 0) {
+        Copy-Item -Path "$Source\*" -Destination $Destination -Recurse -Force
+        Write-Host "  OK: $Name" -ForegroundColor Green
+        return
+    }
+
+    $copied = 0
+    foreach ($id in $OnlyIds) {
+        $mdSrc = Join-Path $Source "$id.md"
+        $dirSrc = Join-Path $Source $id
+        if (Test-Path $mdSrc -PathType Leaf) {
+            Copy-Item -Path $mdSrc -Destination $Destination -Force
+            $copied++
+        } elseif (Test-Path $dirSrc -PathType Container) {
+            $dirDest = Join-Path $Destination $id
+            New-Item -ItemType Directory -Path $dirDest -Force | Out-Null
+            Copy-Item -Path "$dirSrc\*" -Destination $dirDest -Recurse -Force
+            $copied++
+        }
+    }
+    Write-Host "  OK: $Name ($copied installed for selected stacks)" -ForegroundColor Green
 }
 
 function Copy-FileWithBackup {
@@ -57,17 +111,24 @@ function Copy-FileWithBackup {
 Write-Host "Installing components..."
 Write-Host ""
 
+$RuleIds = @()
+$SkillIds = @()
+if ($Stacks.Count -gt 0) {
+    $RuleIds = Get-FilteredIds -ComponentType "rules" -WantedStacks $Stacks
+    $SkillIds = Get-FilteredIds -ComponentType "skills" -WantedStacks $Stacks
+}
+
 # Rules
-Copy-DirectoryMerge "$ScriptDir\rules" "$ClaudeDir\rules" "rules (9 files)"
+Copy-DirectoryMerge "$ScriptDir\rules" "$ClaudeDir\rules" "rules (9 files)" $RuleIds
 
-# Commands
-Copy-DirectoryMerge "$ScriptDir\commands" "$ClaudeDir\commands" "commands (8 slash commands)"
+# Commands (always installed — not stack-specific)
+Copy-DirectoryMerge "$ScriptDir\commands" "$ClaudeDir\commands" "commands (8 slash commands)" @()
 
-# Agents
-Copy-DirectoryMerge "$ScriptDir\agents" "$ClaudeDir\agents" "agents (5 agents)"
+# Agents (always installed — not stack-specific)
+Copy-DirectoryMerge "$ScriptDir\agents" "$ClaudeDir\agents" "agents (5 agents)" @()
 
 # Skills
-Copy-DirectoryMerge "$ScriptDir\skills" "$ClaudeDir\skills" "skills (13 skill packs)"
+Copy-DirectoryMerge "$ScriptDir\skills" "$ClaudeDir\skills" "skills (14 skill packs)" $SkillIds
 
 # Hooks - merge into existing settings.json
 $hooksSource = "$ScriptDir\hooks\settings.json"
@@ -126,10 +187,15 @@ Write-Host ""
 Write-Host "=== Installation Complete ===" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "What was installed:"
-Write-Host "  - 9 coding rules (coding style, Java, Python, JS, DBs, infra, git, testing, security)"
-Write-Host "  - 8 slash commands (/plan, /code-review, /tdd, /build-fix, /api-design, /docker-setup, /system-design, /db-schema)"
-Write-Host "  - 5 specialized agents (planner, code-reviewer, security-reviewer, architect, tdd-guide)"
-Write-Host "  - 13 skill packs (Spring Boot, Python, React, PostgreSQL, JPA, security, and more)"
+if ($Stacks.Count -gt 0) {
+    Write-Host "  - general rules/skills + stacks: $($Stacks -join ',')"
+    Write-Host "  - 8 slash commands, 5 agents (always installed, stack-neutral)"
+} else {
+    Write-Host "  - 9 coding rules (coding style, Java, Python, JS, DBs, infra, git, testing, security)"
+    Write-Host "  - 8 slash commands (/plan, /code-review, /tdd, /build-fix, /api-design, /docker-setup, /system-design, /db-schema)"
+    Write-Host "  - 5 specialized agents (planner, code-reviewer, security-reviewer, architect, tdd-guide)"
+    Write-Host "  - 14 skill packs (Spring Boot, Python, React, PostgreSQL, JPA, Kafka, security, and more)"
+}
 Write-Host "  - 4 code quality hooks (block dangerous commands, warn on print/console.log/System.out)"
 Write-Host "  - 4 MCP servers (context7, memory, sequential-thinking, github)"
 Write-Host ""

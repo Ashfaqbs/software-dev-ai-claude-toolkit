@@ -15,7 +15,7 @@ Rules go in `rules/*.md` and are always-on instructions Claude follows every res
 - Keep it to one technology/domain per file (see `rules/java-springboot.md` for scope).
 - Use short, imperative bullet points, not prose paragraphs.
 - Prefer concrete conventions ("Use constructor injection") over vague advice ("Write clean code").
-- Update `README.md`'s Rules table and `toolkit-manifest.json` to list the new file.
+- Update `README.md`'s Rules table and `toolkit-manifest.json` to list the new file, including a `group` (`general` if it applies across stacks, or a stack id like `java-springboot` if it's specific to one — see `installGroups` in the manifest; add a new group there if you're introducing a stack the toolkit doesn't cover yet, e.g. `go`, `rust`, `.net`).
 
 ## Adding a Slash Command
 
@@ -40,7 +40,7 @@ Skills go in `skills/<skill-name>/` as a domain knowledge pack that loads contex
 
 - Pick a name that describes the domain, not the technology alone (`springboot-security`, not `spring2`).
 - Cover concrete patterns and examples, not a restatement of official docs.
-- Update `README.md`'s Skills table and `toolkit-manifest.json`.
+- Update `README.md`'s Skills table and `toolkit-manifest.json`, including a `group` (same rule as above).
 
 ## Testing Your Change
 
